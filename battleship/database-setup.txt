@@ -1,0 +1,42 @@
+DROP SCHEMA IF EXISTS battleship cascade;
+
+CREATE SCHEMA battleship;
+
+SET SEARCH_PATH TO battleship;
+
+CREATE TABLE Grid(
+                     id SERIAL PRIMARY KEY,
+                     width INT NOT NULL,
+                     height INT NOT NULL
+);
+
+
+CREATE TABLE Game (
+                      id SERIAL PRIMARY KEY,
+                      status VARCHAR(255) NOT NULL,
+                      player_1_id INT NOT NULL,
+                      player_2_id INT NOT NULL,
+                      grid_id INT NOT NULL,
+                      FOREIGN KEY (grid_id) REFERENCES Grid (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Ship(
+                     id SERIAL PRIMARY KEY,
+                     player_id INT NOT NULL,
+                     game_id INT NOT NULL,
+                     x INT NOT NULL,
+                     y INT NOT NULL,
+                     status VARCHAR(255),
+                     FOREIGN KEY (game_id) REFERENCES Game (id) ON DELETE CASCADE
+);
+
+CREATE TABLE Shot(
+                     id SERIAL PRIMARY KEY,
+                     player_id INT NOT NULL,
+                     game_id INT NOT NULL,
+                     x INT NOT NULL,
+                     y INT NOT NULL,
+                     status VARCHAR(255) NOT NULL,
+                     FOREIGN KEY (game_id) REFERENCES Game (id) ON DELETE CASCADE
+);

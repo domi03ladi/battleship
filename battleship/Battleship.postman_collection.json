@@ -1,0 +1,162 @@
+{
+	"info": {
+		"_postman_id": "bce5b872-364f-41bf-9a80-ca95c51d7e0f",
+		"name": "Battleship",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "20079753"
+	},
+	"item": [
+		{
+			"name": "Player",
+			"item": [
+				{
+					"name": "getAll",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getById",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"playerName\" : \"Dominik\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/players/create"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Game",
+			"item": [
+				{
+					"name": "getAll",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getById",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getInfoById",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"ongoing\",\r\n    \"player1\": {\r\n        \"id\": 1\r\n    },\r\n    \"player2\": {\r\n        \"id\": 2\r\n    },\r\n    \"grid\": {\r\n        \"id\": 1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/games/create"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Grid",
+			"item": [
+				{
+					"name": "getAll",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getById",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "http://localhost:8080/api/grids/create"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ship",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"player\" : {\r\n        \"id\": 2\r\n    },\r\n    \"game\" : {\r\n        \"id\": 1\r\n    },\r\n    \"x\" : 6,\r\n    \"y\" : 3,\r\n    \"status\" : \"HIT\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/ships/create"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Shot",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

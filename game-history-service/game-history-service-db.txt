@@ -1,0 +1,15 @@
+DROP SCHEMA IF EXISTS game_history_db cascade;
+
+CREATE SCHEMA game_history_db;
+
+SET SEARCH_PATH TO game_history_db;
+
+CREATE TABLE game_history (
+                              id SERIAL PRIMARY KEY,
+                              game_id INT NOT NULL,
+                              player_1_name VARCHAR(255) NOT NULL,
+                              player_2_name VARCHAR(255) NOT NULL,
+                              winner VARCHAR(255),
+                              started_at timestamp NOT NULL,
+                              finished_at timestamp
+);
