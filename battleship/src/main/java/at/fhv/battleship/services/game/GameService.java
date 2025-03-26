@@ -21,6 +21,7 @@ import at.fhv.battleship.services.ship.ShipService;
 import at.fhv.battleship.services.shot.ShotService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,9 @@ import java.util.Optional;
 
 @Service
 public class GameService {
+
+    @Autowired
+    private StreamBridge streamBridge;
 
     @Autowired
     final IGameRepository gameRepository;
@@ -106,7 +110,8 @@ public class GameService {
                 LocalDateTime.now(),
                 null);
 
-        gameHistoryClient.createGameHistory(gameHistoryDTO);
+        //gameHistoryClient.createGameHistory(gameHistoryDTO);
+        streamBridge.send("gameHistoryTopic", gameHistoryDTO);
 
         return gameMapper.convertToDTO(createdGame);
     }
@@ -176,13 +181,17 @@ public class GameService {
                 currentGameHistory.setWinner(currentGameHistory.getPlayer2Name());
                 currentGameHistory.setFinishedAt(LocalDateTime.now());
                 this.gameRepository.save(gameMapper.convertToEntity(game));
-                gameHistoryClient.updateGameHistory(currentGameHistory.getId(), currentGameHistory);
+
+
+                //gameHistoryClient.updateGameHistory(currentGameHistory.getId(), currentGameHistory);
             } else if (shipsAlivePlayer2 == 0) {
                 game.setStatus("Game over - Player 1 won");
                 currentGameHistory.setWinner(currentGameHistory.getPlayer1Name());
                 currentGameHistory.setFinishedAt(LocalDateTime.now());
                 this.gameRepository.save(gameMapper.convertToEntity(game));
-                gameHistoryClient.updateGameHistory(currentGameHistory.getId(), currentGameHistory);
+
+
+                //gameHistoryClient.updateGameHistory(currentGameHistory.getId(), currentGameHistory);
             }
         }
 
