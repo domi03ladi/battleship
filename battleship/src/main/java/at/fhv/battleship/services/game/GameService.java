@@ -182,7 +182,7 @@ public class GameService {
                 currentGameHistory.setFinishedAt(LocalDateTime.now());
                 this.gameRepository.save(gameMapper.convertToEntity(game));
 
-
+                streamBridge.send("gameHistoryUpdateTopic", currentGameHistory);
                 //gameHistoryClient.updateGameHistory(currentGameHistory.getId(), currentGameHistory);
             } else if (shipsAlivePlayer2 == 0) {
                 game.setStatus("Game over - Player 1 won");
@@ -190,7 +190,7 @@ public class GameService {
                 currentGameHistory.setFinishedAt(LocalDateTime.now());
                 this.gameRepository.save(gameMapper.convertToEntity(game));
 
-
+                streamBridge.send("gameHistoryUpdateTopic", currentGameHistory);
                 //gameHistoryClient.updateGameHistory(currentGameHistory.getId(), currentGameHistory);
             }
         }
