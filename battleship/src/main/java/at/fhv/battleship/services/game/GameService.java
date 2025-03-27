@@ -20,6 +20,8 @@ import at.fhv.battleship.services.player.PlayerService;
 import at.fhv.battleship.services.ship.ShipService;
 import at.fhv.battleship.services.shot.ShotService;
 import jakarta.transaction.Transactional;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Lazy;
@@ -32,6 +34,8 @@ import java.util.Optional;
 
 @Service
 public class GameService {
+
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private StreamBridge streamBridge;
@@ -60,11 +64,14 @@ public class GameService {
     @Lazy
     final GridService gridService;
 
-    public GameService(IGameRepository gameRepository, @Lazy ShipService shipService, @Lazy ShotService shotService, @Lazy PlayerService playerService, @Lazy GridService gridService) {
+    public GameService(IGameRepository gameRepository, @Lazy ShipService shipService, @Lazy ShotService shotService, @Lazy PlayerService playerService, @Lazy GridService gridService, RabbitTemplate rabbitTemplate) {
         this.gameRepository = gameRepository;
         this.shipService = shipService;
         this.shotService = shotService;
         this.gridService = gridService;
+        this.rabbitTemplate = rabbitTemplate;
+        this.rabbitTemplate.setReplyTimeout(4000);
+        this.rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
     }
 
     public List<GameDTO> findAll() throws PlayerNotFoundException {
@@ -177,21 +184,27 @@ public class GameService {
         //if one count is zero - change game status
         if (player1HasShips && player2HasShips) {
             if (shipsAlivePlayer1 == 0) {
+                GameHistoryDTO updatedGameHistoryDTO = new GameHistoryDTO(currentGameHistory.id(),
+                        currentGameHistory.player1Name(),
+                        currentGameHistory.player2Name(),
+                        currentGameHistory.gameId(),
+                        currentGameHistory.player2Name(),
+                        currentGameHistory.startedAt(),
+                        LocalDateTime.now());
                 game.setStatus("Game over - Player 2 won");
-                currentGameHistory.setWinner(currentGameHistory.getPlayer2Name());
-                currentGameHistory.setFinishedAt(LocalDateTime.now());
                 this.gameRepository.save(gameMapper.convertToEntity(game));
-
-                streamBridge.send("gameHistoryUpdateTopic", currentGameHistory);
-                //gameHistoryClient.updateGameHistory(currentGameHistory.getId(), currentGameHistory);
+                streamBridge.send("gameHistoryUpdateTopic", updatedGameHistoryDTO);
             } else if (shipsAlivePlayer2 == 0) {
                 game.setStatus("Game over - Player 1 won");
-                currentGameHistory.setWinner(currentGameHistory.getPlayer1Name());
-                currentGameHistory.setFinishedAt(LocalDateTime.now());
+                GameHistoryDTO updatedGameHistoryDTO = new GameHistoryDTO(currentGameHistory.id(),
+                        currentGameHistory.player1Name(),
+                        currentGameHistory.player2Name(),
+                        currentGameHistory.gameId(),
+                        currentGameHistory.player1Name(),
+                        currentGameHistory.startedAt(),
+                        LocalDateTime.now());
                 this.gameRepository.save(gameMapper.convertToEntity(game));
-
-                streamBridge.send("gameHistoryUpdateTopic", currentGameHistory);
-                //gameHistoryClient.updateGameHistory(currentGameHistory.getId(), currentGameHistory);
+                streamBridge.send("gameHistoryUpdateTopic", updatedGameHistoryDTO);
             }
         }
 
@@ -221,7 +234,8 @@ public class GameService {
     }
 
     public GameHistoryDTO getGameHistoryById(Integer id) throws GameHistoryNotFoundException {
-        return gameHistoryClient.getGameHistoryById(id);
+        Object response = rabbitTemplate.convertSendAndReceive("historyExchange", "historyRoute", id);
+        return (GameHistoryDTO) response;
     }
 
     public GameHistoryDTO getGameHistoryByGameId(Integer id) throws GameHistoryNotFoundException {
@@ -235,5 +249,4 @@ public class GameService {
     public List<GameHistoryDTO> getAllWinsByPlayerName(String name){
         return gameHistoryClient.getAllWinsByPlayerName(name);
     }
-
 }

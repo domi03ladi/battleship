@@ -1,6 +1,6 @@
 package at.fhv.game_history_service.controllers;
 
-import at.fhv.game_history_service.dtos.GameHistoryDTO;
+import at.fhv.battleship.dtos.GameHistoryDTO;
 import at.fhv.game_history_service.services.GameHistoryNotFoundException;
 import at.fhv.game_history_service.services.GameHistoryService;
 import at.fhv.game_history_service.services.GameHistoryValidationException;

@@ -1,8 +1,9 @@
 package at.fhv.game_history_service.services;
 
-import at.fhv.game_history_service.dtos.GameHistoryDTO;
+import at.fhv.battleship.dtos.GameHistoryDTO;
 import at.fhv.game_history_service.entities.GameHistory;
 import at.fhv.game_history_service.repositories.IGameHistoryRepository;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class GameHistoryService {
         return gameHistoryDTOS;
     }
 
+    @RabbitListener(queues = "historyQueue")
     public GameHistoryDTO getGameHistoryById(Integer id) throws GameHistoryNotFoundException{
         Optional<GameHistory> gameHistoryOptional = repository.findById(id);
         if(gameHistoryOptional.isPresent()){
@@ -34,6 +36,12 @@ public class GameHistoryService {
             throw new GameHistoryNotFoundException("The GameHistory with id " + id + " doesn't exists!");
         }
     }
+
+/*    @RabbitListener(queues = "historyQueue")
+    public Integer getGameHistoryById(Integer id){
+        System.out.println("Received Data: " + id);
+        return id;
+    }*/
 
     public GameHistoryDTO getGameHistoryByGameId(Integer id) throws GameHistoryNotFoundException{
         Optional<GameHistory> gameHistoryOptional = repository.getGameHistoriesByGameId(id);
@@ -73,12 +81,12 @@ public class GameHistoryService {
         GameHistory existingGameHistory = repository.findById(id)
                 .orElseThrow(() -> new GameHistoryNotFoundException("GameHistory with ID " + id + " not found!"));
 
-        existingGameHistory.setPlayer1Name(gameHistoryDTO.getPlayer1Name());
-        existingGameHistory.setPlayer2Name(gameHistoryDTO.getPlayer2Name());
-        existingGameHistory.setWinner(gameHistoryDTO.getWinner());
-        existingGameHistory.setGameId(gameHistoryDTO.getGameId());
-        existingGameHistory.setStartedAt(gameHistoryDTO.getStartedAt());
-        existingGameHistory.setFinishedAt(gameHistoryDTO.getFinishedAt());
+        existingGameHistory.setPlayer1Name(gameHistoryDTO.player1Name());
+        existingGameHistory.setPlayer2Name(gameHistoryDTO.player2Name());
+        existingGameHistory.setWinner(gameHistoryDTO.winner());
+        existingGameHistory.setGameId(gameHistoryDTO.gameId());
+        existingGameHistory.setStartedAt(gameHistoryDTO.startedAt());
+        existingGameHistory.setFinishedAt(gameHistoryDTO.finishedAt());
 
         existingGameHistory.validateGameHistory();
 
@@ -99,15 +107,15 @@ public class GameHistoryService {
 
     private GameHistory convertToEntity(GameHistoryDTO gameHistoryDTO){
         GameHistory gameHistory = new GameHistory();
-        if(gameHistoryDTO.getId() != null){
-            gameHistory.setId(gameHistoryDTO.getId());
+        if(gameHistoryDTO.id() != null){
+            gameHistory.setId(gameHistoryDTO.id());
         }
-        gameHistory.setPlayer1Name(gameHistoryDTO.getPlayer1Name());
-        gameHistory.setPlayer2Name(gameHistoryDTO.getPlayer2Name());
-        gameHistory.setGameId(gameHistoryDTO.getGameId());
-        gameHistory.setWinner(gameHistoryDTO.getWinner());
-        gameHistory.setStartedAt(gameHistoryDTO.getStartedAt());
-        gameHistory.setFinishedAt(gameHistoryDTO.getFinishedAt());
+        gameHistory.setPlayer1Name(gameHistoryDTO.player1Name());
+        gameHistory.setPlayer2Name(gameHistoryDTO.player2Name());
+        gameHistory.setGameId(gameHistoryDTO.gameId());
+        gameHistory.setWinner(gameHistoryDTO.winner());
+        gameHistory.setStartedAt(gameHistoryDTO.startedAt());
+        gameHistory.setFinishedAt(gameHistoryDTO.finishedAt());
 
         return gameHistory;
     }

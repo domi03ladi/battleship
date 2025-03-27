@@ -4,6 +4,7 @@ import java.time.Duration;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.timelimiter.TimeLimiterConfig;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
 import org.springframework.cloud.client.circuitbreaker.Customizer;
@@ -33,5 +34,10 @@ public class AppConfig {
                         .timeoutDuration(Duration.ofSeconds(12)) 			// Timeout duration for the TimeLimiter
                         .build())
                 .build());
+    }
+
+    @Bean
+    public Jackson2JsonMessageConverter jackson2JsonMessageConverter(){
+        return new Jackson2JsonMessageConverter();
     }
 }

@@ -62,8 +62,6 @@
 ### 7. Overview for played Games
 #### game-controller - /api/games/history/game/{gameId}
 
-### 8. I added a *[Battleship.postman_collection.json](Battleship.postman_collection.json)* file with some Example Request.
-
 #### Info
 **~** marks a field on the grid \
 **s** marks a ship of player 1 \
